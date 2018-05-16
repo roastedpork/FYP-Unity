@@ -1647,7 +1647,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   RosManager: {fileID: 253445967}
-  ObstaclePrefab: {fileID: 1340326795668188, guid: f329f002c17ae604899cdd9f26d4e2a6,
+  ObstaclePrefab: {fileID: 1407605374315958, guid: f329f002c17ae604899cdd9f26d4e2a6,
     type: 2}
 --- !u!1 &1546044727
 GameObject:

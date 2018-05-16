@@ -42,30 +42,36 @@ public class ObstacleMarkers : RosComponent
             {
                 if (i > old_count)
                 {
-                    // instantiate new marker
-                    //GameObject marker = Instantiate(ObstaclePrefab);
-                    GameObject marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    marker.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
+                    // instantiate new markers if this update exceeds the old count
+                    GameObject marker = Instantiate(ObstaclePrefab);
+                    //GameObject marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    //marker.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
                     markers.Add(marker);
                 }
             }
 
 
-            // Iterate through markers to change values
+            // Iterate through markers to change transform values
             for (int i = 0; i < max; i++)
             {
                 GameObject marker = markers[i];
                 if (i < new_count)
                 {
-                    // instantiate marker
+                    // activate markers if they are needed for this udpate
                     marker.SetActive(true);
-                    ros.geometry_msgs.Point p = obsArray.obstacles[i].rel_position;
+                    ros.hololens_drive.Obstacle newObs = obsArray.obstacles[i];
+                    ros.geometry_msgs.Point p = newObs.rel_position;
+                    Quaternion rotation = Quaternion.Euler(0, -(float)(Mathf.Rad2Deg * newObs.box_angle), 0);
+
+                    
                     marker.transform.position = new Vector3((float) p.x, Parameters.FloorDepth, (float) p.y);
-                    //marker.GetComponent<ObstacleMarker>().SetDimensions((float)obsArray.obstacles[i].width, (float)obsArray.obstacles[i].height, 0.1f);
+                    marker.GetComponent<ObstacleMarker>().SetDimensions((float)newObs.width, (float)newObs.height, 0.1f);
+                    marker.transform.rotation = rotation;
+                    //marker.transform.Rotate(rotation);
                 }
                 else
                 {
-                    // Deactivate marker
+                    // Deactivate marker if unused
                     marker.SetActive(false);
                 }
             }
