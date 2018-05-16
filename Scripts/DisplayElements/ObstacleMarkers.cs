@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ObstacleMarkers : RosComponent
 {
@@ -44,8 +45,6 @@ public class ObstacleMarkers : RosComponent
                 {
                     // instantiate new markers if this update exceeds the old count
                     GameObject marker = Instantiate(ObstaclePrefab);
-                    //GameObject marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    //marker.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
                     markers.Add(marker);
                 }
             }
@@ -67,7 +66,12 @@ public class ObstacleMarkers : RosComponent
                     marker.transform.position = new Vector3((float) p.x, Parameters.FloorDepth, (float) p.y);
                     marker.GetComponent<ObstacleMarker>().SetDimensions((float)newObs.width, (float)newObs.height, 0.1f);
                     marker.transform.rotation = rotation;
-                    //marker.transform.Rotate(rotation);
+
+                    Text label = marker.GetComponent<ObstacleMarker>().TextObject.GetComponent<Text>();
+
+                    label.text = "(" + p.x.ToString() + ", " + p.y.ToString() + ", " + p.z.ToString() + ")\n\r(" + newObs.width + ", " + newObs.height.ToString() + ")";
+
+
                 }
                 else
                 {

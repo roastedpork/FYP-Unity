@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class ObstacleMarker : MonoBehaviour {
 
+    public GameObject TextObject;
+    private GameObject Cam;
+
     private List<Transform> xRods;
     private List<Transform> yRods;
     private List<Transform> zRods;
@@ -28,6 +31,8 @@ public class ObstacleMarker : MonoBehaviour {
         yRods = new List<Transform>();
         zRods = new List<Transform>();
         vertices = new List<Transform>();
+
+        Cam = GameObject.FindGameObjectWithTag("MainCamera");
 
         String[] children = new String[] {"x1","x2","x3","x4","y1","y2","y3","y4","z1","z2","z3","z4",
                                             "p1","p2","p3","p4","p5","p6","p7","p8"};
@@ -91,6 +96,9 @@ public class ObstacleMarker : MonoBehaviour {
         {
             SetDimensions(dims[0], dims[1], dims[2]);
             preloaded = true;
-        }	
+        }
+
+        TextObject.transform.LookAt(Cam.transform);
+        TextObject.transform.Rotate(new Vector3(0, 180, 0));
 	}
 }
