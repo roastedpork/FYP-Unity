@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Minimap : RosComponent {
 
@@ -10,8 +11,7 @@ public class Minimap : RosComponent {
     private String subtopic = "hololens/display/encoded_minimap";
     private String subtype = "std_msgs/String";
 
-    private Renderer renderer;
-
+    private RawImage rawimage;
 
     private const String valuemap = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     // Use this for initialization
@@ -24,7 +24,8 @@ public class Minimap : RosComponent {
                                                      subtopic,
                                                      subtype);
 
-        renderer = GetComponent<Renderer>();
+        rawimage = GetComponent<RawImage>();
+
 
         
     }
@@ -68,7 +69,8 @@ public class Minimap : RosComponent {
 
             Texture2D tex = new Texture2D(2, 2);
             tex.LoadImage(image);
-            renderer.material.mainTexture = tex;
+            rawimage.texture = tex;
+
         }
 	}
 }
