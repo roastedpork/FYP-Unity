@@ -56,7 +56,7 @@ public class ObstacleMarkers : RosComponent
                 GameObject marker = markers[i];
                 if (i < new_count)
                 {
-                    // activate markers if they are needed for this udpate
+                    // activate markers if they are needed for this update
                     marker.SetActive(true);
                     ros.hololens_drive.Obstacle newObs = obsArray.obstacles[i];
                     ros.geometry_msgs.Point p = newObs.rel_position;
@@ -64,12 +64,12 @@ public class ObstacleMarkers : RosComponent
 
                     
                     marker.transform.position = new Vector3((float) p.x, Parameters.FloorDepth, (float) p.y);
-                    marker.GetComponent<ObstacleMarker>().SetDimensions((float)newObs.width, (float)newObs.height, 0.1f);
+                    marker.GetComponent<ObstacleMarker>().SetDimensions((float)newObs.height, (float)newObs.width, 0.1f);
                     marker.transform.rotation = rotation;
 
                     Text label = marker.GetComponent<ObstacleMarker>().TextObject.GetComponent<Text>();
 
-                    label.text = "(" + p.x.ToString() + ", " + p.y.ToString() + ", " + p.z.ToString() + ")\n\r(" + newObs.width + ", " + newObs.height.ToString() + ")";
+                    //label.text = (Mathf.Rad2Deg * newObs.box_angle).ToString();
 
 
                 }
