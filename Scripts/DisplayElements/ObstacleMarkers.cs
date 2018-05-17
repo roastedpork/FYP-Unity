@@ -45,6 +45,7 @@ public class ObstacleMarkers : RosComponent
                 {
                     // instantiate new markers if this update exceeds the old count
                     GameObject marker = Instantiate(ObstaclePrefab);
+                    marker.transform.parent = transform;
                     markers.Add(marker);
                 }
             }
@@ -62,10 +63,10 @@ public class ObstacleMarkers : RosComponent
                     ros.geometry_msgs.Point p = newObs.rel_position;
                     Quaternion rotation = Quaternion.Euler(0, -(float)(Mathf.Rad2Deg * newObs.box_angle), 0);
 
-                    
-                    marker.transform.position = new Vector3((float) p.x, Parameters.FloorDepth, (float) p.y);
+
+                    marker.transform.localPosition = new Vector3((float) p.x, Parameters.FloorDepth, (float) p.y);
                     marker.GetComponent<ObstacleMarker>().SetDimensions((float)newObs.height, (float)newObs.width, 0.1f);
-                    marker.transform.rotation = rotation;
+                    marker.transform.localRotation = rotation;
 
                     Text label = marker.GetComponent<ObstacleMarker>().TextObject.GetComponent<Text>();
 
