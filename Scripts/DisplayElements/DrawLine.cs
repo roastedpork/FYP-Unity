@@ -27,7 +27,7 @@ public class DrawLine : RosComponent
         lineRenderer = GetComponent<LineRenderer>();
         lineRenderer.startWidth = 0.01f;
         lineRenderer.endWidth = 0.01f;
-
+        lineRenderer.useWorldSpace = false;
         
         
     }
@@ -53,7 +53,7 @@ public class DrawLine : RosComponent
 
 
 
-                pointList.Add(point);
+                pointList.Add(point); // + transform.parent.position);
             }
 
             lineRenderer.SetPositions(pointList.ToArray());
