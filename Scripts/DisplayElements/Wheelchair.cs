@@ -30,7 +30,7 @@ public class Wheelchair : RosComponent {
         {
             ros.geometry_msgs.Pose2D msg = sub.GetNewMessage();
             transform.position = new Vector3((float)msg.x, 0, (float) msg.y);
-            transform.rotation = Quaternion.Euler(0, -(float) msg.theta, 0);
+            transform.rotation = Quaternion.Euler(0, -(float) (Mathf.Rad2Deg * msg.theta), 0);
         }
 
         
