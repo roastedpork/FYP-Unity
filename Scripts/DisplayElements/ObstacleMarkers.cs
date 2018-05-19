@@ -12,7 +12,6 @@ public class ObstacleMarkers : RosComponent
     private List<GameObject> markers;
     private RosSubscriber<ros.hololens_drive.ObstacleArray> sub;
     private String subtopic = "/formatted_grid/obs_array";
-    private String subtype = "hololens_drive/ObstacleArray";
 
 	// Use this for initialization
 	void Start () {
@@ -21,8 +20,7 @@ public class ObstacleMarkers : RosComponent
 
         sub = new RosSubscriber<ros.hololens_drive.ObstacleArray>(RosManager,
                                                                   "ObstacleMarkerSub",
-                                                                  subtopic,
-                                                                  subtype);
+                                                                  subtopic);
 
         markers = new List<GameObject>();
     }

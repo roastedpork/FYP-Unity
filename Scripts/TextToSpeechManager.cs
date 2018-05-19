@@ -13,11 +13,9 @@ public class TextToSpeechManager : RosComponent
     // ROS communication
     private RosSubscriber<ros.std_msgs.String> sub;
     private String SubTopic = "/hololens/audio/voice_over";
-    private String SubType = "std_msgs/String";
 
     private RosPublisher<ros.std_msgs.String> pub;
     private String PubTopic = "/hololens/audio/transcript";
-    private String PubType = "std_msgs/String";
 
     // Voice & Microphone
     private TextToSpeech voicebox;
@@ -31,13 +29,11 @@ public class TextToSpeechManager : RosComponent
 
         sub = new RosSubscriber<ros.std_msgs.String>(RosManager,
                                                      "Voice_Sub",
-                                                     SubTopic,
-                                                     SubType);
+                                                     SubTopic);
 
         pub = new RosPublisher<ros.std_msgs.String>(RosManager,
                                                     "Voice_Pub",
-                                                    PubTopic,
-                                                    PubType);
+                                                    PubTopic);
 
 
         voicebox = GetComponent<TextToSpeech>();

@@ -11,7 +11,6 @@ public class Wheelchair : RosComponent {
 
     private RosSubscriber<ros.geometry_msgs.Pose2D> sub;
     private String subtopic = "hololens/wheelchair_pose";
-    private String subtype = "geometry_msgs/Pose2D";
 
 	// Use this for initialization
 	void Start () {
@@ -19,8 +18,7 @@ public class Wheelchair : RosComponent {
 
         sub = new RosSubscriber<ros.geometry_msgs.Pose2D>(RosManager,
                                                           "WheelchairPoseSub",
-                                                          subtopic,
-                                                          subtype);
+                                                          subtopic);
     }
 	
 	// Update is called once per frame

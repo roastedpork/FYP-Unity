@@ -10,17 +10,12 @@ public class BatteryDisplay : RosComponent {
 
     private RosSubscriber<ros.std_msgs.Float64> sub;
     private string subTopic = "/hololens/display/battery/set_battery_value";
-    private string subType = "std_msgs/Float64";
 
     // Use this for initialization
     void Start () {
-        StartCoroutine(WaitForRosMessengerInitialisation("BatteryDisplay"));
-        StartCoroutine(WaitUntilRosMessengerConnected("BatteryDisplay"));
-
         sub = new RosSubscriber<ros.std_msgs.Float64>(RosManager,
                                                       "BatteryDisplay_Sub",
-                                                      subTopic,
-                                                      subType);
+                                                      subTopic);
 
         display = transform.Find("Text").GetComponent<Text>();
 

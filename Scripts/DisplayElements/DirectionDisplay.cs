@@ -8,7 +8,6 @@ public class DirectionDisplay : RosComponent
 
     private RosSubscriber<ros.sensor_msgs.Joy> sub;
     private String subtopic = "/arta/arta_joystick";
-    private String subtype = "sensor_msgs/Joy";
 
     public Double Size { get; private set; }
 
@@ -18,8 +17,7 @@ public class DirectionDisplay : RosComponent
         StartCoroutine(WaitUntilRosMessengerConnected("Arrow"));
         sub = new RosSubscriber<ros.sensor_msgs.Joy>(RosManager,
                                                      "DirectionArrowSub",
-                                                     subtopic,
-                                                     subtype);
+                                                     subtopic);
 
         Size = 0.0;
 	}

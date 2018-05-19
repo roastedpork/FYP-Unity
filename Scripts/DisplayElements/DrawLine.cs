@@ -6,11 +6,9 @@ public class DrawLine : RosComponent
 {
 
     private LineRenderer lineRenderer;
-    private float depth = -0.9f;
 
     private RosSubscriber<ros.nav_msgs.GridCells> sub;
     private string subtopic = "/hololens/display/trajectory";
-    private string subtype = "nav_msgs/GridCells";
 
 
 
@@ -22,8 +20,7 @@ public class DrawLine : RosComponent
 
         sub = new RosSubscriber<ros.nav_msgs.GridCells>(RosManager,
                                                          "LineRenderSub",
-                                                         subtopic,
-                                                         subtype);
+                                                         subtopic);
         lineRenderer = GetComponent<LineRenderer>();
         lineRenderer.startWidth = 0.01f;
         lineRenderer.endWidth = 0.01f;

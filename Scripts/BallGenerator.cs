@@ -8,11 +8,9 @@ public class BallGenerator : RosComponent
 
     private RosSubscriber<ros.geometry_msgs.Vector3> sub;
     private String SubTopic = "/hololens/spawn_point";
-    private String SubType = "geometry_msgs/Vector3";
 
     private RosPublisher<ros.std_msgs.String> pub;
     private String PubTopic = "/hololens/spawn_ack";
-    private String PubType = "std_msgs/String";
 
 	// Use this for initialization
 	void Start ()
@@ -22,13 +20,11 @@ public class BallGenerator : RosComponent
         
         sub = new RosSubscriber<ros.geometry_msgs.Vector3>(RosManager,
                                                            "BallGenerator_Sub",
-                                                           SubTopic,
-                                                           SubType);
+                                                           SubTopic);
 
         pub = new RosPublisher<ros.std_msgs.String>(RosManager,
                                                     "BallGenerator_Pub",
-                                                    PubTopic,
-                                                    PubType);
+                                                    PubTopic);
 
     }
 

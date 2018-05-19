@@ -8,7 +8,6 @@ public class FrameGenerator : RosComponent
 
     private RosSubscriber<ros.geometry_msgs.PoseStamped> sub;
     private System.String RosTopic = "/hololens/frame";
-    private System.String RosType = "geometry_msgs/PoseStamped";
 
     public GameObject FramePrefab;
 
@@ -20,8 +19,7 @@ public class FrameGenerator : RosComponent
 
         sub = new RosSubscriber<ros.geometry_msgs.PoseStamped>(RosManager,
                                                                "FrameGenerator_Sub",
-                                                               RosTopic,
-                                                               RosType);
+                                                               RosTopic);
     }
 
     // Update is called once per frame
