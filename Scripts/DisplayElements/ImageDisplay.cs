@@ -43,6 +43,7 @@ public class ImageDisplay : RosComponent
         LeftArrowImage = LeftArrow.GetComponent<RawImage>();
         RightArrowImage = RightArrow.GetComponent<RawImage>();
 
+        MinimapImage.color = new Color(1, 1, 1, 0);
         LeftArrowImage.color = new Color(1, 1, 1, 0);
         RightArrowImage.color = new Color(1, 1, 1, 0);
     }
