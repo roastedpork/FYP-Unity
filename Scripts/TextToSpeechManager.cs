@@ -12,10 +12,11 @@ public class TextToSpeechManager : RosComponent
 
     // ROS communication
     private RosSubscriber<ros.std_msgs.String> sub;
-    private String SubTopic = "/hololens/audio/voice_over";
-
     private RosPublisher<ros.std_msgs.String> pub;
-    private String PubTopic = "/hololens/audio/transcript";
+
+
+    private WaypointManager wpmanager;
+
 
     // Voice & Microphone
     private TextToSpeech voicebox;
@@ -24,18 +25,13 @@ public class TextToSpeechManager : RosComponent
 
     private void Start()
     {
-        StartCoroutine(WaitForRosMessengerInitialisation("TextToSpeechManager"));
-        StartCoroutine(WaitUntilRosMessengerConnected("TextToSpeechManager"));
+        StartCoroutine(WaitUntilRosMessengerConnected("SpeechInputManager"));
 
-        sub = new RosSubscriber<ros.std_msgs.String>(RosManager,
-                                                     "Voice_Sub",
-                                                     SubTopic);
+        Advertise("VoicePub", "/hololens/audio/transcript", 10, out pub);
+        Subscribe("VoiceSub", "/hololens/audio/voice_over", 10, out sub);
 
-        pub = new RosPublisher<ros.std_msgs.String>(RosManager,
-                                                    "Voice_Pub",
-                                                    PubTopic);
-
-
+        wpmanager = GetComponent<WaypointManager>();
+        
         voicebox = GetComponent<TextToSpeech>();
         voicebox.Voice = TextToSpeechVoice.Zira;
 
@@ -46,6 +42,31 @@ public class TextToSpeechManager : RosComponent
             pub.SendMessage(msg);
             voicebox.StartSpeaking("Hello");
         });
+
+        keywords.Add("Move there", () => { if (!wpmanager.AddingMultipleWaypoints) wpmanager.SingleWaypoint(); });
+        keywords.Add("Add point", () => {
+            if (wpmanager.AddWaypoint())
+            {
+                voicebox.StartSpeaking("Point added");
+            }
+            else
+            {
+                voicebox.StartSpeaking("Could not add point");
+            }
+            
+        });
+        keywords.Add("goodbye", () => {
+            if (wpmanager.AddingMultipleWaypoints)
+            {
+                wpmanager.PublishWaypoints();
+                voicebox.StartSpeaking("Moving along path");
+            }
+            else
+            {
+                voicebox.StartSpeaking("This should not happen");
+            }
+        });
+
 
         keywordRecognizer = new KeywordRecognizer(keywords.Keys.ToArray());
         keywordRecognizer.OnPhraseRecognized += KeywordRecognizer_OnPhraseRecognized;

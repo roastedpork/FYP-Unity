@@ -5,20 +5,13 @@ using UnityEngine;
 
 
 public class Wheelchair : RosComponent {
-
-    private GameObject Cam;
-
-
+    
     private RosSubscriber<ros.geometry_msgs.Pose2D> sub;
-    private String subtopic = "hololens/wheelchair_pose";
-
+    
 	// Use this for initialization
 	void Start () {
-	    Cam = GameObject.FindGameObjectWithTag("MainCamera");
-
-        sub = new RosSubscriber<ros.geometry_msgs.Pose2D>(RosManager,
-                                                          "WheelchairPoseSub",
-                                                          subtopic);
+        StartCoroutine(WaitUntilRosMessengerConnected("WheelchairPose"));
+        Subscribe("WheelchairPoseSub", "/hololens/wheelchair_pose", 10, out sub);
     }
 	
 	// Update is called once per frame

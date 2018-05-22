@@ -10,7 +10,7 @@ public class ObstacleMarkers : RosComponent
     public GameObject ObstaclePrefab;
 
     private List<GameObject> markers;
-    private RosSubscriber<ros.hololens_drive.ObstacleArray> sub;
+    private RosSubscriber<ros.hololens_project.ObstacleArray> sub;
     private String subtopic = "/formatted_grid/obs_array";
 
 	// Use this for initialization
@@ -18,7 +18,7 @@ public class ObstacleMarkers : RosComponent
         StartCoroutine(WaitForRosMessengerInitialisation("ObstacleMarker"));
         StartCoroutine(WaitUntilRosMessengerConnected("ObstacleMarker"));
 
-        sub = new RosSubscriber<ros.hololens_drive.ObstacleArray>(RosManager,
+        sub = new RosSubscriber<ros.hololens_project.ObstacleArray>(RosManager,
                                                                   "ObstacleMarkerSub",
                                                                   subtopic);
 
@@ -29,7 +29,7 @@ public class ObstacleMarkers : RosComponent
 	void Update () {
         while (sub.MsgReady)
         {
-            ros.hololens_drive.ObstacleArray obsArray = sub.GetNewMessage();
+            ros.hololens_project.ObstacleArray obsArray = sub.GetNewMessage();
             int new_count = obsArray.obstacles.Count;
             int old_count = markers.Count;
             int max = (new_count > old_count) ? new_count : old_count;
@@ -57,7 +57,7 @@ public class ObstacleMarkers : RosComponent
                 {
                     // activate markers if they are needed for this update
                     marker.SetActive(true);
-                    ros.hololens_drive.Obstacle newObs = obsArray.obstacles[i];
+                    ros.hololens_project.Obstacle newObs = obsArray.obstacles[i];
                     ros.geometry_msgs.Point p = newObs.rel_position;
                     Quaternion rotation = Quaternion.Euler(0, -(float)(Mathf.Rad2Deg * newObs.box_angle), 0);
 

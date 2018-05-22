@@ -18,27 +18,19 @@ public class ImageDisplay : RosComponent
 
 
     private RosSubscriber<ros.std_msgs.String> minimapSub;
-    private String mapsubtopic = "hololens/display/encoded_minimap";
+    private String mapsubtopic = "/hololens/display/encoded_minimap";
 
     private RosSubscriber<ros.std_msgs.Float64> rotationSub;
-    private String rotsubtopic = "hololens/display/rotation_magnitude";
+    private String rotsubtopic = "/hololens/display/smoothed_rotation";
     
 
     private const String valuemap = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     // Use this for initialization
     void Start()
     {
-        StartCoroutine(WaitForRosMessengerInitialisation("Minimap"));
-        StartCoroutine(WaitUntilRosMessengerConnected("Minimap"));
-
-        minimapSub = new RosSubscriber<ros.std_msgs.String>(RosManager,
-                                                            "MinimapSub",
-                                                            mapsubtopic);
-
-        rotationSub = new RosSubscriber<ros.std_msgs.Float64>(RosManager,
-                                                             "RotationSub",
-                                                             rotsubtopic);
-
+        Subscribe("MinimapSub", "/hololens/display/encoded_minimap", 10, out minimapSub);
+        Subscribe("RotationSub", "/hololens/display/smoothed_rotation", 10, out rotationSub);
+        
         MinimapImage = Minimap.GetComponent<RawImage>();
         LeftArrowImage = LeftArrow.GetComponent<RawImage>();
         RightArrowImage = RightArrow.GetComponent<RawImage>();
@@ -85,6 +77,7 @@ public class ImageDisplay : RosComponent
             Texture2D tex = new Texture2D(2, 2);
             tex.LoadImage(image);
             MinimapImage.texture = tex;
+            MinimapImage.color = new Color(1, 1, 1, 1);
 
         }
 

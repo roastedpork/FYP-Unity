@@ -22,31 +22,14 @@ public class UserHeadset : RosComponent {
         }
         else Debug.Log("[UserHeadset] Camera could not be found");
 
-
-        headPosePub = new RosPublisher<ros.geometry_msgs.Pose>(RosManager, "headPosePub", "/hololens/head_pose");
-        gazePointPub = new RosPublisher<ros.geometry_msgs.Point>(RosManager, "gazePointPub", "/hololens/gaze_point");
-
-        prevTimeStamp[headPosePub.name] = Time.unscaledTime;
-        prevTimeStamp[gazePointPub.name] = Time.unscaledTime;
+        Advertise("headPosePub", "/hololens/head_pose", 2, out headPosePub);
+        Advertise("gazePosePub", "/hololens/gaze_point", 2, out gazePointPub);
 
     }
 	
 	// Update is called once per frame
 	void Update () {    
         ros.geometry_msgs.Pose headPose = new ros.geometry_msgs.Pose(transform.position, transform.rotation);
-        Publish(headPosePub, headPose, 0.5);
-
-        RaycastHit hitInfo;
-        if (Physics.Raycast(
-                Camera.main.transform.position,
-                Camera.main.transform.forward,
-                out hitInfo,
-                20.0f,
-                Physics.DefaultRaycastLayers))
-        {
-            ros.geometry_msgs.Point gazePoint = new ros.geometry_msgs.Point(hitInfo.point);
-            Publish(gazePointPub, gazePoint, 0.5);
-        }
-
+        Publish(headPosePub, headPose);
     }
 }
