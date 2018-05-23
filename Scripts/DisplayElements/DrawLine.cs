@@ -4,23 +4,14 @@ using UnityEngine;
 
 public class DrawLine : RosComponent
 {
-
-    private LineRenderer lineRenderer;
-
     private RosSubscriber<ros.nav_msgs.GridCells> sub;
-    private string subtopic = "/hololens/display/trajectory";
-
-
-
+    private LineRenderer lineRenderer;
 
     // Use this for initialization
     void Start () {
-        StartCoroutine(WaitForRosMessengerInitialisation("LineRenderer"));
-        StartCoroutine(WaitUntilRosMessengerConnected("LineRenderer"));
 
-        sub = new RosSubscriber<ros.nav_msgs.GridCells>(RosManager,
-                                                         "LineRenderSub",
-                                                         subtopic);
+        Subscribe("LineRenderSub", "/hololens/display/trajectory", 10, out sub);
+        
         lineRenderer = GetComponent<LineRenderer>();
         lineRenderer.startWidth = 0.01f;
         lineRenderer.endWidth = 0.01f;
@@ -31,12 +22,11 @@ public class DrawLine : RosComponent
     	
 	// Update is called once per frame
 	void Update () {
-        while (sub.MsgReady)
-        {
-            ros.nav_msgs.GridCells path = sub.GetNewMessage();
+        ros.nav_msgs.GridCells path;
 
+        if(Receive(sub, out path))
+        { 
             List<Vector3> pointList = new List<Vector3>();
-            //List<Material> matList = new List<Material>();
 
             int count = path.cells.Count;
             float dalpha = (float) (1.0 / count);
@@ -50,7 +40,7 @@ public class DrawLine : RosComponent
 
 
 
-                pointList.Add(point); // + transform.parent.position);
+                pointList.Add(point);
             }
 
             lineRenderer.SetPositions(pointList.ToArray());

@@ -10,7 +10,6 @@ public class Wheelchair : RosComponent {
     
 	// Use this for initialization
 	void Start () {
-        StartCoroutine(WaitUntilRosMessengerConnected("WheelchairPose"));
         Subscribe("WheelchairPoseSub", "/hololens/wheelchair_pose", 10, out sub);
     }
 	

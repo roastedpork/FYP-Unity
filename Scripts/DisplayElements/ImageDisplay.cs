@@ -18,11 +18,7 @@ public class ImageDisplay : RosComponent
 
 
     private RosSubscriber<ros.std_msgs.String> minimapSub;
-    private String mapsubtopic = "/hololens/display/encoded_minimap";
-
     private RosSubscriber<ros.std_msgs.Float64> rotationSub;
-    private String rotsubtopic = "/hololens/display/smoothed_rotation";
-    
 
     private const String valuemap = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     // Use this for initialization
@@ -69,9 +65,12 @@ public class ImageDisplay : RosComponent
     // Update is called once per frame
     void Update()
     {
-        if (minimapSub.MsgReady)
+        ros.std_msgs.String mapMsg;
+        ros.std_msgs.Float64 rotMsg;
+
+        if (Receive(minimapSub, out mapMsg))
         {
-            String encoded = minimapSub.GetNewMessage().data;
+            String encoded = mapMsg.data;
             byte[] image = DecodeString(encoded);
 
             Texture2D tex = new Texture2D(2, 2);
@@ -81,19 +80,12 @@ public class ImageDisplay : RosComponent
 
         }
 
-        if (rotationSub.MsgReady)
+        if (Receive(rotationSub, out rotMsg))
         {
-            Double rotation = rotationSub.GetNewMessage().data;
-            if (rotation > 0)
-            {
-                LeftArrowImage.color = new Color(1, 1, 1, (float)rotation);
-                RightArrowImage.color = new Color(1, 1, 1, 0);
-            }
-            else
-            {
-                LeftArrowImage.color = new Color(1, 1, 1, 0);
-                RightArrowImage.color = new Color(1, 1, 1, -(float)rotation);
-            }
+            Double rotation = rotMsg.data;
+
+            LeftArrowImage.color = new Color(1, 1, 1, (rotation > 0) ? (float)rotation : 0);
+            RightArrowImage.color = new Color(1, 1, 1, (rotation > 0) ? 0 : -(float)rotation);
         }
     }
 }

@@ -11,30 +11,23 @@ public class ObstacleMarkers : RosComponent
 
     private List<GameObject> markers;
     private RosSubscriber<ros.hololens_project.ObstacleArray> sub;
-    private String subtopic = "/formatted_grid/obs_array";
 
 	// Use this for initialization
-	void Start () {
-        StartCoroutine(WaitForRosMessengerInitialisation("ObstacleMarker"));
-        StartCoroutine(WaitUntilRosMessengerConnected("ObstacleMarker"));
-
-        sub = new RosSubscriber<ros.hololens_project.ObstacleArray>(RosManager,
-                                                                  "ObstacleMarkerSub",
-                                                                  subtopic);
-
+	void Start ()
+    {
         markers = new List<GameObject>();
+        Subscribe("ObstacleMarkersSub", "/formatted_grid/obs_array", 10, out sub);
     }
 	
 	// Update is called once per frame
 	void Update () {
-        while (sub.MsgReady)
+
+        ros.hololens_project.ObstacleArray obsArray;
+        if (Receive(sub, out obsArray))
         {
-            ros.hololens_project.ObstacleArray obsArray = sub.GetNewMessage();
             int new_count = obsArray.obstacles.Count;
             int old_count = markers.Count;
             int max = (new_count > old_count) ? new_count : old_count;
-
-            
 
             // Instantiate new markers if more are needed
             for (int i = 1; i <= max; i++)
@@ -47,7 +40,6 @@ public class ObstacleMarkers : RosComponent
                     markers.Add(marker);
                 }
             }
-
 
             // Iterate through markers to change transform values
             for (int i = 0; i < max; i++)
@@ -65,11 +57,6 @@ public class ObstacleMarkers : RosComponent
                     marker.transform.localPosition = new Vector3((float) p.x, Parameters.FloorDepth, (float) p.y);
                     marker.GetComponent<ObstacleMarker>().SetDimensions((float)newObs.height, (float)newObs.width, 0.1f);
                     marker.transform.localRotation = rotation;
-
-                    Text label = marker.GetComponent<ObstacleMarker>().TextObject.GetComponent<Text>();
-
-                    //label.text = (Mathf.Rad2Deg * newObs.box_angle).ToString();
-
 
                 }
                 else
