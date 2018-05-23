@@ -469,7 +469,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 100002, guid: 625e8f2320beeb34e9c281a6fdffa9fe, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 625e8f2320beeb34e9c281a6fdffa9fe, type: 3}
@@ -2007,6 +2007,8 @@ GameObject:
   - component: {fileID: 1748413952}
   - component: {fileID: 1748413956}
   - component: {fileID: 1748413955}
+  - component: {fileID: 1748413957}
+  - component: {fileID: 1748413954}
   m_Layer: 0
   m_Name: UserHeadset
   m_TagString: Untagged
@@ -2045,6 +2047,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1748413954
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1748413950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6cd57a86591411448607ab5c2b7e6e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RosManager: {fileID: 253445967}
 --- !u!114 &1748413955
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2138,6 +2152,18 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+--- !u!114 &1748413957
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1748413950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84d31cf74943c3e4fa5c9e4c30c05def, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RosManager: {fileID: 253445967}
 --- !u!1 &1843148964
 GameObject:
   m_ObjectHideFlags: 0
