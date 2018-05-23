@@ -9,7 +9,7 @@ Material:
   m_Name: move_scale_arrow_soft
   m_Shader: {fileID: 4800000, guid: d45c0efca53019e43891b0f610f8146e, type: 3}
   m_ShaderKeywords: _ALPHABLEND_ON _BORDER_LIGHT_USES_HOVER_COLOR _DIRECTIONAL_LIGHT
-    _EMISSION _REFLECTIONS _SPECULAR_HIGHLIGHTS
+    _DISABLE_ALBEDO_MAP _EMISSION _REFLECTIONS _SPECULAR_HIGHLIGHTS
   m_LightmapFlags: 1
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
