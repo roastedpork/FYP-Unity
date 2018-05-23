@@ -17,6 +17,8 @@ public class TextToSpeechManager : RosComponent
 
     private WaypointManager wpmanager;
 
+    public GameObject AlignmentManager;
+    private WorldAlignment alignManager;
 
     // Voice & Microphone
     private TextToSpeech voicebox;
@@ -31,6 +33,7 @@ public class TextToSpeechManager : RosComponent
         Subscribe("VoiceSub", "/hololens/audio/voice_over", 10, out sub);
 
         wpmanager = GetComponent<WaypointManager>();
+        alignManager = AlignmentManager.GetComponent<WorldAlignment>();
         
         voicebox = GetComponent<TextToSpeech>();
         voicebox.Voice = TextToSpeechVoice.Zira;
@@ -64,6 +67,43 @@ public class TextToSpeechManager : RosComponent
             else
             {
                 voicebox.StartSpeaking("This should not happen");
+            }
+        });
+
+        // Activation phrases for setting world markers
+        keywords.Add("Set marker one", () =>
+        {
+            if (alignManager.SetMarker(1))
+            {
+                voicebox.StartSpeaking("Marker one set");
+            }
+            else
+            {
+                voicebox.StartSpeaking("Could not set marker one");
+            }
+        });
+
+        keywords.Add("Set marker two", () =>
+        {
+            if (alignManager.SetMarker(2))
+            {
+                voicebox.StartSpeaking("Marker two set");
+            }
+            else
+            {
+                voicebox.StartSpeaking("Could not set marker two");
+            }
+        });
+
+        keywords.Add("Set marker three", () =>
+        {
+            if (alignManager.SetMarker(3))
+            {
+                voicebox.StartSpeaking("Marker three set");
+            }
+            else
+            {
+                voicebox.StartSpeaking("Could not set marker three");
             }
         });
 
