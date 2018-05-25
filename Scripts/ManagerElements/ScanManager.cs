@@ -13,7 +13,7 @@ public class ScanManager : MonoBehaviour, IInputClickHandler
     // Use this for initialization
     void Start()
     {
-        InputManager.Instance.PushFallbackInputHandler(this.gameObject);
+        InputManager.Instance.PushFallbackInputHandler(gameObject);
         SpatialUnderstanding.Instance.RequestBeginScanning();
         SpatialUnderstanding.Instance.ScanStateChanged += ScanStateChanged;
     }
@@ -44,13 +44,22 @@ public class ScanManager : MonoBehaviour, IInputClickHandler
             case SpatialUnderstanding.ScanStates.ReadyToScan:
                 break;
             case SpatialUnderstanding.ScanStates.Scanning:
-                this.LogSurfaceState();
+                LogSurfaceState();
                 break;
             case SpatialUnderstanding.ScanStates.Finishing:
-                this.InstructionTextMesh.text = "State: Finishing Scan";
+                InstructionTextMesh.text = "State: Finishing Scan";
                 break;
             case SpatialUnderstanding.ScanStates.Done:
-                this.InstructionTextMesh.text = "State: Scan Finished";
+                Vector3 origin = Camera.main.transform.position;
+                Vector3 dir = Camera.main.transform.forward * GazeGestureManager.Instance.MaxRange;
+                IntPtr resPtr = SpatialUnderstanding.Instance.UnderstandingDLL.GetStaticRaycastResultPtr();
+
+                int success = SpatialUnderstandingDll.Imports.PlayspaceRaycast(origin.x, origin.y, origin.z,
+                                                                               dir.x, dir.y, dir.z,
+                                                                               resPtr);
+
+                SpatialUnderstandingDll.Imports.RaycastResult res = SpatialUnderstanding.Instance.UnderstandingDLL.GetStaticRaycastResult();
+                InstructionTextMesh.text = res.SurfaceType.ToString();
                 break;
             default:
                 break;
@@ -63,13 +72,14 @@ public class ScanManager : MonoBehaviour, IInputClickHandler
         if (SpatialUnderstandingDll.Imports.QueryPlayspaceStats(statsPtr) != 0)
         {
             var stats = SpatialUnderstanding.Instance.UnderstandingDLL.GetStaticPlayspaceStats();
-            this.InstructionTextMesh.text = string.Format("TotalSurfaceArea: {0:0.##}\nWallSurfaceArea: {1:0.##}\nHorizSurfaceArea: {2:0.##}", stats.TotalSurfaceArea, stats.WallSurfaceArea, stats.HorizSurfaceArea);
+            
+            InstructionTextMesh.text = string.Format("TotalSurfaceArea: {0:0.##}\nWallSurfaceArea: {1:0.##}\nHorizSurfaceArea: {2:0.##}", stats.TotalSurfaceArea, stats.WallSurfaceArea, stats.HorizSurfaceArea);
         }
     }
-
+    
     public void OnInputClicked(InputClickedEventData eventData)
     {
-        this.InstructionTextMesh.text = "Requested Finish Scan";
+        InstructionTextMesh.text = "Requested Finish Scan";
 
         SpatialUnderstanding.Instance.RequestFinishScan();
     }
@@ -80,6 +90,7 @@ public class ScanManager : MonoBehaviour, IInputClickHandler
 
         SpatialUnderstandingDllTopology.TopologyResult[] _resultsTopology = new SpatialUnderstandingDllTopology.TopologyResult[QueryResultMaxCount];
 
+        
         var minLengthFloorSpace = 0.25f;
         var minWidthFloorSpace = 0.25f;
 
@@ -88,13 +99,13 @@ public class ScanManager : MonoBehaviour, IInputClickHandler
 
         if (locationCount > 0)
         {
-            Instantiate(this.FloorPrefab, _resultsTopology[0].position, Quaternion.LookRotation(_resultsTopology[0].normal, Vector3.up));
+            Instantiate(FloorPrefab, _resultsTopology[0].position, Quaternion.LookRotation(_resultsTopology[0].normal, Vector3.up));
 
-            this.InstructionTextMesh.text = "Placed the hologram";
+            InstructionTextMesh.text = "Placed the hologram";
         }
         else
         {
-            this.InstructionTextMesh.text = "I can't found the enough space to place the hologram.";
+            InstructionTextMesh.text = "I can't found the enough space to place the hologram.";
         }
     }
 }

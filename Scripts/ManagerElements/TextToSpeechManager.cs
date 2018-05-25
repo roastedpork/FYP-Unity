@@ -27,7 +27,6 @@ public class TextToSpeechManager : RosComponent
 
     private void Start()
     {
-        StartCoroutine(WaitUntilRosMessengerConnected("SpeechInputManager"));
 
         Advertise("VoicePub", "/hololens/audio/transcript", 10, out pub);
         Subscribe("VoiceSub", "/hololens/audio/voice_over", 10, out sub);

@@ -7,7 +7,7 @@ public class UserHeadset : RosComponent {
 
     private Camera cam;
 
-    private RosPublisher<ros.geometry_msgs.Pose> headPosePub;
+    private RosPublisher<ros.geometry_msgs.PoseStamped> headPosePub;
     private RosPublisher<ros.geometry_msgs.Point> gazePointPub;
  
 	// Use this for initialization
@@ -28,8 +28,13 @@ public class UserHeadset : RosComponent {
     }
 	
 	// Update is called once per frame
-	void Update () {    
-        ros.geometry_msgs.Pose headPose = new ros.geometry_msgs.Pose(transform.position, transform.rotation);
+	void Update () {
+        ros.geometry_msgs.PoseStamped headPose = new ros.geometry_msgs.PoseStamped
+        {
+            pose = new ros.geometry_msgs.Pose(transform.position, transform.rotation)
+        };
+        headPose.header.frame_id = "/hololens";
+
         Publish(headPosePub, headPose);
     }
 }
