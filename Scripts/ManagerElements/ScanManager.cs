@@ -3,12 +3,12 @@ using HoloToolkit.Unity;
 using HoloToolkit.Unity.InputModule;
 using UnityEngine;
 
-public class ScanManager : MonoBehaviour, IInputClickHandler
+public class ScanManager : Scripts.Singleton<ScanManager>, IInputClickHandler
 {
     public TextMesh InstructionTextMesh;
     public Transform FloorPrefab;
     public Transform WallPrefab;
-    public Transform SurfacePrefag;
+    public Transform SurfacePrefab;
 
     // Use this for initialization
     void Start()
@@ -17,7 +17,7 @@ public class ScanManager : MonoBehaviour, IInputClickHandler
         SpatialUnderstanding.Instance.RequestBeginScanning();
         SpatialUnderstanding.Instance.ScanStateChanged += ScanStateChanged;
     }
-
+    
     private void ScanStateChanged()
     {
         if (SpatialUnderstanding.Instance.ScanState == SpatialUnderstanding.ScanStates.Scanning)

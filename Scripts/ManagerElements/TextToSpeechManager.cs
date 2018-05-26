@@ -15,39 +15,52 @@ public class TextToSpeechManager : RosComponent
     private RosPublisher<ros.std_msgs.String> pub;
 
 
-    private WaypointManager wpmanager;
-
-    public GameObject AlignmentManager;
-    private WorldAlignment alignManager;
+    public WaypointManager wpManager;
+    public WorldAlignment alignManager;
 
     // Voice & Microphone
     private TextToSpeech voicebox;
     private KeywordRecognizer keywordRecognizer;
     private Dictionary<String, Action> keywords = new Dictionary<string, Action>();
 
+
+    private bool connected = false;
+
+
+
+
     private void Start()
     {
+        if (RosMessenger.Instance.Con)
+        {
+            Advertise("VoicePub", "/hololens/audio/transcript", 10, out pub);
+            Subscribe("VoiceSub", "/hololens/audio/voice_over", 10, out sub);
+            connected = true;
+        }
 
-        Advertise("VoicePub", "/hololens/audio/transcript", 10, out pub);
-        Subscribe("VoiceSub", "/hololens/audio/voice_over", 10, out sub);
 
-        wpmanager = GetComponent<WaypointManager>();
-        alignManager = AlignmentManager.GetComponent<WorldAlignment>();
-        
+
+        transform.parent = wpManager.gameObject.transform;
         voicebox = GetComponent<TextToSpeech>();
         voicebox.Voice = TextToSpeechVoice.Zira;
+        
+
 
         // Activation phrase for dictation
         keywords.Add("Hello", () =>
         {
             ros.std_msgs.String msg = new ros.std_msgs.String("Hello!");
-            pub.SendMessage(msg);
+            if (pub != null) pub.SendMessage(msg);
             voicebox.StartSpeaking("Hello");
         });
 
-        keywords.Add("Move there", () => { if (!wpmanager.AddingMultipleWaypoints) wpmanager.SingleWaypoint(); });
+        keywords.Add("Move there", () => {
+            if (!wpManager.gameObject.activeSelf) voicebox.StartSpeaking("Waypoint manager is not active");
+            else if (!wpManager.AddingMultipleWaypoints) wpManager.SingleWaypoint();
+        });
         keywords.Add("Add point", () => {
-            if (wpmanager.AddWaypoint())
+            if (!wpManager.gameObject.activeSelf) voicebox.StartSpeaking("Waypoint manager is not active");
+            else if(wpManager.AddWaypoint())
             {
                 voicebox.StartSpeaking("Point added");
             }
@@ -58,9 +71,10 @@ public class TextToSpeechManager : RosComponent
             
         });
         keywords.Add("goodbye", () => {
-            if (wpmanager.AddingMultipleWaypoints)
+            if (!wpManager.gameObject.activeSelf) voicebox.StartSpeaking("Waypoint manager is not active");
+            else if(wpManager.AddingMultipleWaypoints)
             {
-                wpmanager.PublishWaypoints();
+                wpManager.PublishWaypoints();
                 voicebox.StartSpeaking("Moving along path");
             }
             else
@@ -72,7 +86,11 @@ public class TextToSpeechManager : RosComponent
         // Activation phrases for setting world markers
         keywords.Add("Set marker one", () =>
         {
-            if (alignManager.SetMarker(1))
+            if (!alignManager.gameObject.activeSelf)
+            {
+                voicebox.StartSpeaking("Alignment manager is not active");
+            }
+            else if (alignManager.SetMarker(1))
             {
                 voicebox.StartSpeaking("Marker one set");
             }
@@ -84,7 +102,11 @@ public class TextToSpeechManager : RosComponent
 
         keywords.Add("Set marker two", () =>
         {
-            if (alignManager.SetMarker(2))
+            if (!alignManager.gameObject.activeSelf)
+            {
+                voicebox.StartSpeaking("Alignment manager is not active");
+            }
+            else if (alignManager.SetMarker(2))
             {
                 voicebox.StartSpeaking("Marker two set");
             }
@@ -96,7 +118,11 @@ public class TextToSpeechManager : RosComponent
 
         keywords.Add("Set marker three", () =>
         {
-            if (alignManager.SetMarker(3))
+            if (!alignManager.gameObject.activeSelf)
+            {
+                voicebox.StartSpeaking("Alignment manager is not active");
+            }
+            else if (alignManager.SetMarker(3))
             {
                 voicebox.StartSpeaking("Marker three set");
             }
@@ -105,6 +131,8 @@ public class TextToSpeechManager : RosComponent
                 voicebox.StartSpeaking("Could not set marker three");
             }
         });
+
+
 
 
         keywordRecognizer = new KeywordRecognizer(keywords.Keys.ToArray());
@@ -125,11 +153,18 @@ public class TextToSpeechManager : RosComponent
 
     // Update is called once per frame
     void Update () {
+        if (!connected && RosMessenger.Instance.Con)
+        {
+            Advertise("VoicePub", "/hololens/audio/transcript", 10, out pub);
+            Subscribe("VoiceSub", "/hololens/audio/voice_over", 10, out sub);
+            connected = true;
+        }
+
         if (sub != null)
         {
-            while (sub.MsgReady)
+            ros.std_msgs.String msg;
+            if(Receive(sub, out msg))
             {
-                ros.std_msgs.String msg = sub.GetNewMessage();
                 voicebox.StartSpeaking(msg.data);
             }
         }
