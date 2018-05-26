@@ -13,11 +13,16 @@ public class ScanManager : Scripts.Singleton<ScanManager>, IInputClickHandler
     // Use this for initialization
     void Start()
     {
+        
+    }
+    
+    public void StartScan()
+    {
         InputManager.Instance.PushFallbackInputHandler(gameObject);
         SpatialUnderstanding.Instance.RequestBeginScanning();
         SpatialUnderstanding.Instance.ScanStateChanged += ScanStateChanged;
     }
-    
+
     private void ScanStateChanged()
     {
         if (SpatialUnderstanding.Instance.ScanState == SpatialUnderstanding.ScanStates.Scanning)
