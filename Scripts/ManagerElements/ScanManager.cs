@@ -10,17 +10,45 @@ public class ScanManager : Scripts.Singleton<ScanManager>, IInputClickHandler
     public Transform WallPrefab;
     public Transform SurfacePrefab;
 
+    public GameObject SpatialMappingPrefab;
+    public GameObject SpatialUnderstandingPrefab;
+
+    public bool IsScanning { get; private set; }
+
     // Use this for initialization
     void Start()
     {
-        
+        IsScanning = false;
     }
     
     public void StartScan()
     {
-        InputManager.Instance.PushFallbackInputHandler(gameObject);
-        SpatialUnderstanding.Instance.RequestBeginScanning();
-        SpatialUnderstanding.Instance.ScanStateChanged += ScanStateChanged;
+        if (HoloToolkit.Unity.SpatialMapping.SpatialMappingManager.Instance == null)
+        {
+            GameObject sm = Instantiate(SpatialMappingPrefab);
+            sm.GetComponent<HoloToolkit.Unity.SpatialMapping.SpatialMappingManager>().DrawVisualMeshes = false;
+            Instantiate(SpatialUnderstandingPrefab);
+            
+
+        } else if (!HoloToolkit.Unity.SpatialMapping.SpatialMappingManager.Instance.IsObserverRunning())
+        {
+            HoloToolkit.Unity.SpatialMapping.SpatialMappingManager.Instance.StartObserver();
+            SpatialUnderstanding.Instance.RequestBeginScanning();
+        }
+
+        IsScanning = true;
+        // HoloToolkit.Unity.SpatialMapping.SpatialMappingManager.Instance.StartObserver();
+        // InputManager.Instance.PushFallbackInputHandler(gameObject);
+        // SpatialUnderstanding.Instance.RequestBeginScanning();
+        // SpatialUnderstanding.Instance.ScanStateChanged += ScanStateChanged;
+    }
+
+    public void StopScan()
+    {
+        SpatialUnderstanding.Instance.RequestFinishScan();
+        HoloToolkit.Unity.SpatialMapping.SpatialMappingManager.Instance.StopObserver();
+        IsScanning = false;
+        InstructionTextMesh.text = "Requested Finish Scan";
     }
 
     private void ScanStateChanged()

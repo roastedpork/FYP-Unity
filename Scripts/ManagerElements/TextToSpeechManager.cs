@@ -146,6 +146,18 @@ public class TextToSpeechManager : RosComponent
         });
 
 
+        keywords.Add("Stop scan", () =>
+        {
+            if (ScanManager.Instance.isActiveAndEnabled)
+            {
+                voicebox.StartSpeaking("Stopping scan");
+                ScanManager.Instance.StopScan();
+            }
+            else
+            {
+                voicebox.StartSpeaking("Scan Manager is not active");
+            }
+        });
 
         keywordRecognizer = new KeywordRecognizer(keywords.Keys.ToArray());
         keywordRecognizer.OnPhraseRecognized += KeywordRecognizer_OnPhraseRecognized;
