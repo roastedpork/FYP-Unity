@@ -132,12 +132,13 @@ public class TextToSpeechManager : RosComponent
             }
         });
 
-        keywords.Add("Start scan", () =>
+        keywords.Add("Begin scan", () =>
         {
             if (ScanManager.Instance.isActiveAndEnabled)
             {
                 voicebox.StartSpeaking("Starting scan");
                 ScanManager.Instance.StartScan();
+                //Parameters.FloorDepth = 0.0f;
             }
             else
             {
@@ -155,7 +156,7 @@ public class TextToSpeechManager : RosComponent
 
                 GameObject floor = GameObject.CreatePrimitive(PrimitiveType.Plane);
                 floor.transform.position = new Vector3(0, Parameters.FloorDepth, 0);
-                floor.transform.localScale = new Vector3(1, 1, 1) * 15;
+                floor.transform.localScale = new Vector3(1, 1, 1) * 30;
                 floor.GetComponent<MeshRenderer>().enabled = false;
             }
             else

@@ -24,7 +24,7 @@ public class ScanManager : Scripts.Singleton<ScanManager> //, IInputClickHandler
     void Start()
     {
         IsScanning = false;
-        InstructionTextMesh.text = "Say \"Start scan\" to begin searching for floor depth";
+        InstructionTextMesh.text = "Say \"Begin scan\" to begin searching for floor depth";
     }
     
     public void StartScan()
@@ -44,10 +44,13 @@ public class ScanManager : Scripts.Singleton<ScanManager> //, IInputClickHandler
 
     public void StopScan()
     {
-        SpatialUnderstanding.Instance.RequestFinishScan();
-        HoloToolkit.Unity.SpatialMapping.SpatialMappingManager.Instance.StopObserver();
-        Destroy(smHandler);
-        Destroy(suHandler);
+        if (IsScanning)
+        {
+            SpatialUnderstanding.Instance.RequestFinishScan();
+            HoloToolkit.Unity.SpatialMapping.SpatialMappingManager.Instance.StopObserver();
+            Destroy(smHandler);
+            Destroy(suHandler);
+        }
 
         IsScanning = false;
         InstructionTextMesh.text = "";
