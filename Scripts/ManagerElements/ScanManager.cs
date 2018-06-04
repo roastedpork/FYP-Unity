@@ -3,7 +3,7 @@ using HoloToolkit.Unity;
 using HoloToolkit.Unity.InputModule;
 using UnityEngine;
 
-public class ScanManager : Scripts.Singleton<ScanManager>, IInputClickHandler
+public class ScanManager : Scripts.Singleton<ScanManager> //, IInputClickHandler
 {
     public TextMesh InstructionTextMesh;
     public Transform FloorPrefab;
@@ -13,64 +13,60 @@ public class ScanManager : Scripts.Singleton<ScanManager>, IInputClickHandler
     public GameObject SpatialMappingPrefab;
     public GameObject SpatialUnderstandingPrefab;
 
+    private GameObject smHandler;
+    private GameObject suHandler;
+
+
+
     public bool IsScanning { get; private set; }
 
     // Use this for initialization
     void Start()
     {
         IsScanning = false;
+        InstructionTextMesh.text = "Say \"Start scan\" to begin searching for floor depth";
     }
     
     public void StartScan()
     {
         if (HoloToolkit.Unity.SpatialMapping.SpatialMappingManager.Instance == null)
         {
-            GameObject sm = Instantiate(SpatialMappingPrefab);
-            sm.GetComponent<HoloToolkit.Unity.SpatialMapping.SpatialMappingManager>().DrawVisualMeshes = false;
-            Instantiate(SpatialUnderstandingPrefab);
+            smHandler = Instantiate(SpatialMappingPrefab);
+            smHandler.GetComponent<HoloToolkit.Unity.SpatialMapping.SpatialMappingManager>().DrawVisualMeshes = false;
+            suHandler = Instantiate(SpatialUnderstandingPrefab);
+            //suHandler.GetComponent<SpatialUnderstandingCustomMesh>().CreateMeshColliders = false;
             
+            IsScanning = true;
 
-        } else if (!HoloToolkit.Unity.SpatialMapping.SpatialMappingManager.Instance.IsObserverRunning())
-        {
-            HoloToolkit.Unity.SpatialMapping.SpatialMappingManager.Instance.StartObserver();
-            SpatialUnderstanding.Instance.RequestBeginScanning();
-        }
-
-        IsScanning = true;
-        // HoloToolkit.Unity.SpatialMapping.SpatialMappingManager.Instance.StartObserver();
-        // InputManager.Instance.PushFallbackInputHandler(gameObject);
-        // SpatialUnderstanding.Instance.RequestBeginScanning();
-        // SpatialUnderstanding.Instance.ScanStateChanged += ScanStateChanged;
+            InstructionTextMesh.text = "Scanning for floor depth...";
+        } 
     }
 
     public void StopScan()
     {
         SpatialUnderstanding.Instance.RequestFinishScan();
         HoloToolkit.Unity.SpatialMapping.SpatialMappingManager.Instance.StopObserver();
+        Destroy(smHandler);
+        Destroy(suHandler);
+
         IsScanning = false;
-        InstructionTextMesh.text = "Requested Finish Scan";
+        InstructionTextMesh.text = "";
     }
-
-    private void ScanStateChanged()
-    {
-        if (SpatialUnderstanding.Instance.ScanState == SpatialUnderstanding.ScanStates.Scanning)
-        {
-            LogSurfaceState();
-        }
-        else if (SpatialUnderstanding.Instance.ScanState == SpatialUnderstanding.ScanStates.Done)
-        {
-            InstanciateObjectOnFloor();
-        }
-    }
-
-    private void OnDestroy()
-    {
-        SpatialUnderstanding.Instance.ScanStateChanged -= ScanStateChanged;
-    }
+    
 
     // Update is called once per frame
     void Update()
     {
+        if (IsScanning && GazeGestureManager.Instance.Focused)
+        {
+            Parameters.FloorDepth = (Parameters.FloorDepth > GazeGestureManager.Instance.position.y) ? GazeGestureManager.Instance.position.y : Parameters.FloorDepth;
+            InstructionTextMesh.text = "Current Floor Depth: " + Parameters.FloorDepth.ToString(); 
+        }
+
+
+
+
+        /*
         switch (SpatialUnderstanding.Instance.ScanState)
         {
             case SpatialUnderstanding.ScanStates.None:
@@ -92,11 +88,12 @@ public class ScanManager : Scripts.Singleton<ScanManager>, IInputClickHandler
                                                                                resPtr);
 
                 SpatialUnderstandingDll.Imports.RaycastResult res = SpatialUnderstanding.Instance.UnderstandingDLL.GetStaticRaycastResult();
-                InstructionTextMesh.text = res.SurfaceType.ToString();
+                InstructionTextMesh.text = res.SurfaceType.ToString(); 
                 break;
             default:
                 break;
         }
+        */
     }
 
     private void LogSurfaceState()
@@ -109,14 +106,14 @@ public class ScanManager : Scripts.Singleton<ScanManager>, IInputClickHandler
             InstructionTextMesh.text = string.Format("TotalSurfaceArea: {0:0.##}\nWallSurfaceArea: {1:0.##}\nHorizSurfaceArea: {2:0.##}", stats.TotalSurfaceArea, stats.WallSurfaceArea, stats.HorizSurfaceArea);
         }
     }
-    
+    /*
     public void OnInputClicked(InputClickedEventData eventData)
     {
         InstructionTextMesh.text = "Requested Finish Scan";
 
         SpatialUnderstanding.Instance.RequestFinishScan();
     }
-
+    
     private void InstanciateObjectOnFloor()
     {
         const int QueryResultMaxCount = 512;
@@ -141,4 +138,5 @@ public class ScanManager : Scripts.Singleton<ScanManager>, IInputClickHandler
             InstructionTextMesh.text = "I can't found the enough space to place the hologram.";
         }
     }
+    */
 }

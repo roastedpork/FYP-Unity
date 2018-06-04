@@ -152,6 +152,11 @@ public class TextToSpeechManager : RosComponent
             {
                 voicebox.StartSpeaking("Stopping scan");
                 ScanManager.Instance.StopScan();
+
+                GameObject floor = GameObject.CreatePrimitive(PrimitiveType.Plane);
+                floor.transform.position = new Vector3(0, Parameters.FloorDepth, 0);
+                floor.transform.localScale = new Vector3(1, 1, 1) * 15;
+                floor.GetComponent<MeshRenderer>().enabled = false;
             }
             else
             {

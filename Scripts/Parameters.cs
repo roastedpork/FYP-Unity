@@ -4,5 +4,5 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Parameters {
-    public const float FloorDepth = -0.9f;
+    public static float FloorDepth = -0.8f;
 }
