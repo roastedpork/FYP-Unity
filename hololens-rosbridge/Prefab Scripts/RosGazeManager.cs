@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RosGazeManager : Scripts.Singleton<RosGazeManager> {
+public class RosGazeManager : HoloToolkit.Unity.Singleton<RosGazeManager> {
 
     
     public float MaxRange = 10.0f;

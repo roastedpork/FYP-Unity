@@ -3,7 +3,7 @@ using HoloToolkit.Unity;
 using HoloToolkit.Unity.InputModule;
 using UnityEngine;
 
-public class RosScanManager : Scripts.Singleton<RosScanManager>
+public class RosScanManager : Singleton<RosScanManager>
 {
     public TextMesh InstructionTextMesh;
     public bool DrawMesh = true;

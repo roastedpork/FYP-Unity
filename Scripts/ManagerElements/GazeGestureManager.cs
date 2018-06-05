@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GazeGestureManager : Scripts.Singleton<GazeGestureManager> {
+public class GazeGestureManager : HoloToolkit.Unity.Singleton<GazeGestureManager> {
 
     public GameObject Pointer;
     public float MaxRange = 10.0f;

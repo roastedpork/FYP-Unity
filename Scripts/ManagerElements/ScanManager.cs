@@ -3,7 +3,7 @@ using HoloToolkit.Unity;
 using HoloToolkit.Unity.InputModule;
 using UnityEngine;
 
-public class ScanManager : Scripts.Singleton<ScanManager> //, IInputClickHandler
+public class ScanManager : HoloToolkit.Unity.Singleton<ScanManager> //, IInputClickHandler
 {
     public TextMesh InstructionTextMesh;
     public bool DrawMesh = true;
