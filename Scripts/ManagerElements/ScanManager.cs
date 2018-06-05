@@ -23,6 +23,9 @@ public class ScanManager : HoloToolkit.Unity.Singleton<ScanManager> //, IInputCl
     {
         IsScanning = false;
         InstructionTextMesh.text = "Say \"Begin scan\" to begin searching for floor depth";
+
+
+
     }
     
     public void StartScan()

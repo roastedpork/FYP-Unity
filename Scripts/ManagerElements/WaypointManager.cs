@@ -4,70 +4,104 @@ using UnityEngine;
 
 public class WaypointManager : RosComponent {
 
-    private RosPublisher<ros.geometry_msgs.PoseArray> pub;
+    private RosPublisher<ros.geometry_msgs.PoseArray> waypointPub;
+    private RosPublisher<ros.geometry_msgs.PoseStamped> trackingPub;
     private ros.geometry_msgs.PoseArray buffer;
-    public bool AddingMultipleWaypoints { get; private set; }
 
-    private GazeGestureManager gazeManager;
+    private bool AddingMultipleWaypoints = false;
+    private bool ContinuousTracking = false;
 
 	// Use this for initialization
 	void Start () {
         
-        bool stat = Advertise("WaypointPub", "/hololens/waypoints", 5, out pub);
-
-        Debug.Log("Waypoint publisher exists: " +  stat.ToString());
-
-        AddingMultipleWaypoints = false;
-        gazeManager = GazeGestureManager.Instance;
+        Advertise("WaypointPub", "/hololens/waypoints", 5, out waypointPub);
+        Advertise("WaypointPub", "/hololens/continous_tracking", 5, out trackingPub);
+        StartCoroutine(WaitForSpeechInit());
     }
 
-    public void SingleWaypoint()
+    private IEnumerator WaitForSpeechInit()
     {
-        buffer = new ros.geometry_msgs.PoseArray();
-        buffer.header.frame_id = "/hololens";
+        yield return new WaitUntil(() => RosGazeManager.Instance != null && RosUserSpeechManager.Instance != null);
 
-        if (gazeManager.Focused)
+
+        RosUserSpeechManager.Instance.AddNewPhrase("Move here", () => 
         {
-            ros.geometry_msgs.Pose newPoint = new ros.geometry_msgs.Pose(gazeManager.position, Quaternion.identity);
-            buffer.poses.Add(newPoint);
-        }
+            if (AddingMultipleWaypoints)
+            {
+                RosUserSpeechManager.Instance.voicebox.StartSpeaking("Removing previous set of waypoints");
+                AddingMultipleWaypoints = false;
+            }
 
-        PublishWaypoints();
-    }
-
-    public bool AddWaypoint()
-    {
-        if (!AddingMultipleWaypoints)
-        {
-            AddingMultipleWaypoints = true;
             buffer = new ros.geometry_msgs.PoseArray();
-            buffer.header.frame_id = "/hololens";
-        }
-        
-        if (gazeManager.Focused)
+            buffer.header.frame_id = "Unity";
+
+            if (RosGazeManager.Instance.Focused)
+            {
+                ros.geometry_msgs.Pose newPoint = new ros.geometry_msgs.Pose(RosGazeManager.Instance.position, Quaternion.identity);
+                buffer.poses.Add(newPoint);
+                Publish(waypointPub, buffer);
+                RosUserSpeechManager.Instance.voicebox.StartSpeaking("Moving to new location");
+
+            }
+            else
+            {
+                RosUserSpeechManager.Instance.voicebox.StartSpeaking("Unable to set a waypoint, please scan the room first");
+            }
+
+            
+        });
+
+        RosUserSpeechManager.Instance.AddNewPhrase("Add point", () =>
         {
-            ros.geometry_msgs.Pose newPoint = new ros.geometry_msgs.Pose(gazeManager.position, Quaternion.identity);
-            buffer.poses.Add(newPoint);
+            if (!AddingMultipleWaypoints)
+            {
+                buffer = new ros.geometry_msgs.PoseArray();
+                buffer.header.frame_id = "Unity";
+                AddingMultipleWaypoints = true;
+            }
+            
+            if (RosGazeManager.Instance.Focused)
+            {
+                ros.geometry_msgs.Pose newPoint = new ros.geometry_msgs.Pose(RosGazeManager.Instance.position, Quaternion.identity);
+                buffer.poses.Add(newPoint);
+                RosUserSpeechManager.Instance.voicebox.StartSpeaking("New waypoint set");
+            }
+             else
+            {
+                RosUserSpeechManager.Instance.voicebox.StartSpeaking("Unable to set a waypoint");
+            }
 
-            return true;
-        }
+        });
 
-        if (buffer.poses.Count == 0)
+        RosUserSpeechManager.Instance.AddNewPhrase("traverse path", () =>
         {
-            AddingMultipleWaypoints = false;
-        }
-        return false;
-
+            if (AddingMultipleWaypoints)
+            {
+                Publish(waypointPub, buffer);
+                AddingMultipleWaypoints = false;
+                RosUserSpeechManager.Instance.voicebox.StartSpeaking("Moving along specified path");
+            }
+        });
+        RosUserSpeechManager.Instance.AddNewPhrase("Track my gaze", () =>
+        {
+            ContinuousTracking = true;
+            RosUserSpeechManager.Instance.voicebox.StartSpeaking("Gaze tracking starting");
+        });
+        RosUserSpeechManager.Instance.AddNewPhrase("End tracking", () =>
+        {
+            ContinuousTracking = false;
+            RosUserSpeechManager.Instance.voicebox.StartSpeaking("Gaze tracking ended");
+        });
     }
 
-    public void PublishWaypoints()
-    {
-        if (buffer != null) Publish(pub, buffer);
-        buffer = null;
-        AddingMultipleWaypoints = false;
-    }
-
+    
     void Update () {
-		
+		if (ContinuousTracking && RosGazeManager.Instance.Focused)
+        {
+            ros.geometry_msgs.PoseStamped msg = new ros.geometry_msgs.PoseStamped();
+            msg.header.frame_id = "/Unity";
+
+            msg.pose.position = new ros.geometry_msgs.Point(RosGazeManager.Instance.position);
+        }
 	}
 }

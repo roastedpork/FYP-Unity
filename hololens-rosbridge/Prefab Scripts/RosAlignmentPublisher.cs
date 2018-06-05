@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WorldAlignment : RosComponent {
-
+public class RosAlignmentPublisher : ros.Singleton<RosAlignmentPublisher>
+{
     public List<GameObject> Markers;
-
     private UnityEngine.XR.WSA.Persistence.WorldAnchorStore anchorStore;
     private RosPublisher<ros.geometry_msgs.PolygonStamped> pub;
 
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         Advertise("WorldAlignmentPub", "/hololens/reference_points", 1, out pub);
 
         UnityEngine.XR.WSA.Persistence.WorldAnchorStore.GetAsync(AnchorStoreReady);
@@ -67,7 +67,8 @@ public class WorldAlignment : RosComponent {
 
         string[] ids = anchorStore.GetAllIds();
 
-        foreach (GameObject marker in Markers){
+        foreach (GameObject marker in Markers)
+        {
 
             // Retrieve WorldAnchors for each marker if it exists
             Debug.Log("Looking for " + marker.name + " in WorldAnchorStore");
@@ -92,7 +93,8 @@ public class WorldAlignment : RosComponent {
     }
 
     // Update is called once per frame
-    void Update () {
+    void Update()
+    {
         ros.geometry_msgs.PolygonStamped msg = new ros.geometry_msgs.PolygonStamped();
         msg.header.frame_id = "/Unity";
 
@@ -102,10 +104,10 @@ public class WorldAlignment : RosComponent {
             ros.geometry_msgs.Point32 temp = new ros.geometry_msgs.Point32(obj.transform.position);
             msg.polygon.points.Add(temp);
         }
-        
+
         Publish(pub, msg);
 
-	}
+    }
 
 
     public bool SetMarker(int marker)
@@ -116,7 +118,7 @@ public class WorldAlignment : RosComponent {
 
         //RaycastHit hitInfo;
         /*Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hitInfo)*/
-        if ( RosGazeManager.Instance.Focused )
+        if (RosGazeManager.Instance.Focused)
         {
             if (anchorStore == null) return false;
 
