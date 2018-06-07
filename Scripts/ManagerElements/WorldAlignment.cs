@@ -8,6 +8,7 @@ public class WorldAlignment : RosComponent {
 
     private UnityEngine.XR.WSA.Persistence.WorldAnchorStore anchorStore;
     private RosPublisher<ros.geometry_msgs.PolygonStamped> pub;
+    
 
     // Use this for initialization
     void Start () {
@@ -72,7 +73,10 @@ public class WorldAlignment : RosComponent {
             // Retrieve WorldAnchors for each marker if it exists
             Debug.Log("Looking for " + marker.name + " in WorldAnchorStore");
             UnityEngine.XR.WSA.WorldAnchor wa = anchorStore.Load(marker.name, marker);
-            if (wa != null) Debug.Log("Retrieved anchor from WorldAnchorStore");
+            if (wa != null)
+            {
+                Debug.Log("Retrieved anchor from WorldAnchorStore");
+            }
             else
             {
                 // Set new WorldAnchor if no existing WorldAnchor found
@@ -96,10 +100,11 @@ public class WorldAlignment : RosComponent {
         ros.geometry_msgs.PolygonStamped msg = new ros.geometry_msgs.PolygonStamped();
         msg.header.frame_id = "/Unity";
 
+        Debug.Log("[WorldAlignment] current floor depth = " + Parameters.FloorDepth.ToString());
 
         foreach (GameObject obj in Markers)
         {
-            ros.geometry_msgs.Point32 temp = new ros.geometry_msgs.Point32(obj.transform.position);
+            ros.geometry_msgs.Point32 temp = new ros.geometry_msgs.Point32(obj.transform.position.x, obj.transform.position.z, Parameters.FloorDepth);
             msg.polygon.points.Add(temp);
         }
         
@@ -155,6 +160,7 @@ public class WorldAlignment : RosComponent {
             bool saved = anchorStore.Save(anchor.gameObject.name, anchor);
             Debug.Log("Saved WorldAnchor for " + anchor.gameObject.name + " in callback: " + saved);
             anchor.OnTrackingChanged -= AttachingAnchor_OnTrackingChanged;
+
         }
     }
 

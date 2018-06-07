@@ -5,17 +5,14 @@ using UnityEngine;
 public class WaypointManager : RosComponent {
 
     private RosPublisher<ros.geometry_msgs.PoseArray> waypointPub;
-    private RosPublisher<ros.geometry_msgs.PoseStamped> trackingPub;
     private ros.geometry_msgs.PoseArray buffer;
-
     private bool AddingMultipleWaypoints = false;
-    private bool ContinuousTracking = false;
 
 	// Use this for initialization
 	void Start () {
         
-        Advertise("WaypointPub", "/hololens/waypoints", 5, out waypointPub);
-        Advertise("WaypointPub", "/hololens/continous_tracking", 5, out trackingPub);
+        Advertise("WaypointPub", "/hololens/navigation/waypoints", 5, out waypointPub);
+        
         StartCoroutine(WaitForSpeechInit());
     }
 
@@ -33,11 +30,14 @@ public class WaypointManager : RosComponent {
             }
 
             buffer = new ros.geometry_msgs.PoseArray();
-            buffer.header.frame_id = "Unity";
+            buffer.header.frame_id = "/Unity";
 
             if (RosGazeManager.Instance.Focused)
             {
-                ros.geometry_msgs.Pose newPoint = new ros.geometry_msgs.Pose(RosGazeManager.Instance.position, Quaternion.identity);
+                Quaternion camRot = Camera.main.transform.rotation * Quaternion.Euler(0, -90, 0);
+                Quaternion pointRot = Quaternion.Euler(0, camRot.eulerAngles.y, 0);
+                
+                ros.geometry_msgs.Pose newPoint = new ros.geometry_msgs.Pose(RosGazeManager.Instance.position, pointRot);
                 buffer.poses.Add(newPoint);
                 Publish(waypointPub, buffer);
                 RosUserSpeechManager.Instance.voicebox.StartSpeaking("Moving to new location");
@@ -62,7 +62,22 @@ public class WaypointManager : RosComponent {
             
             if (RosGazeManager.Instance.Focused)
             {
-                ros.geometry_msgs.Pose newPoint = new ros.geometry_msgs.Pose(RosGazeManager.Instance.position, Quaternion.identity);
+                Quaternion pointRot;
+                if (buffer.poses.Count > 0)
+                {
+                    Vector3 prevPoint = buffer.poses[buffer.poses.Count - 1].position.AsUnityVector;
+                    Vector3 delta = (RosGazeManager.Instance.position - prevPoint).normalized;
+
+                    float angle = -(Mathf.Rad2Deg * Mathf.Atan2(delta.z, delta.x));
+                    pointRot = Quaternion.Euler(0, angle, 0);
+                }
+                else
+                {
+                    Quaternion camRot = Camera.main.transform.rotation * Quaternion.Euler(0, -90, 0);
+                    pointRot = Quaternion.Euler(0, camRot.eulerAngles.y, 0);
+                }
+
+                ros.geometry_msgs.Pose newPoint = new ros.geometry_msgs.Pose(RosGazeManager.Instance.position, pointRot);
                 buffer.poses.Add(newPoint);
                 RosUserSpeechManager.Instance.voicebox.StartSpeaking("New waypoint set");
             }
@@ -73,7 +88,7 @@ public class WaypointManager : RosComponent {
 
         });
 
-        RosUserSpeechManager.Instance.AddNewPhrase("traverse path", () =>
+        RosUserSpeechManager.Instance.AddNewPhrase("start moving", () =>
         {
             if (AddingMultipleWaypoints)
             {
@@ -82,26 +97,10 @@ public class WaypointManager : RosComponent {
                 RosUserSpeechManager.Instance.voicebox.StartSpeaking("Moving along specified path");
             }
         });
-        RosUserSpeechManager.Instance.AddNewPhrase("Track my gaze", () =>
-        {
-            ContinuousTracking = true;
-            RosUserSpeechManager.Instance.voicebox.StartSpeaking("Gaze tracking starting");
-        });
-        RosUserSpeechManager.Instance.AddNewPhrase("End tracking", () =>
-        {
-            ContinuousTracking = false;
-            RosUserSpeechManager.Instance.voicebox.StartSpeaking("Gaze tracking ended");
-        });
+        
     }
 
     
     void Update () {
-		if (ContinuousTracking && RosGazeManager.Instance.Focused)
-        {
-            ros.geometry_msgs.PoseStamped msg = new ros.geometry_msgs.PoseStamped();
-            msg.header.frame_id = "/Unity";
-
-            msg.pose.position = new ros.geometry_msgs.Point(RosGazeManager.Instance.position);
-        }
 	}
 }
