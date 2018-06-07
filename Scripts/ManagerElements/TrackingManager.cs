@@ -2,14 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TrackingManager : RosComponent {
+public class TrackingManager : ros.Singleton<TrackingManager> {
 
     private RosPublisher<ros.geometry_msgs.PoseStamped> trackingPub;
-    private bool ContinuousTracking = false;
-    
-    
+    public bool ContinuousTracking { get; private set; }
+
+    public GameObject DirectionArrowPrefab;
+    private GameObject arrow;
+
+
     // Use this for initialization
     void Start () {
+        ContinuousTracking = false;
+
         Advertise("WaypointPub", "/hololens/navigation/continuous_tracking", 5, out trackingPub);
         StartCoroutine(WaitForSpeechInit());
     }
@@ -43,6 +48,18 @@ public class TrackingManager : RosComponent {
             msg.pose.orientation = new ros.geometry_msgs.Quaternion(pointRot);
 
             Publish(trackingPub, msg);
+
+            if (arrow == null)
+            {
+                arrow = Instantiate(DirectionArrowPrefab, msg.pose.position.AsUnityVector, msg.pose.orientation.AsUnityQuaternion);
+            } else
+            {
+                arrow.transform.position = msg.pose.position.AsUnityVector;
+                arrow.transform.rotation = msg.pose.orientation.AsUnityQuaternion;
+            }
+        } else if (!ContinuousTracking && (arrow != null))
+        {
+            Destroy(arrow);
         }
     }
 }

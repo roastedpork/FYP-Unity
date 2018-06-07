@@ -8,9 +8,15 @@ public class WaypointManager : RosComponent {
     private ros.geometry_msgs.PoseArray buffer;
     private bool AddingMultipleWaypoints = false;
 
+    public GameObject DirectionArrowPrefab;
+    private List<GameObject> arrows;
+
+
 	// Use this for initialization
 	void Start () {
-        
+        arrows = new List<GameObject>();
+        buffer = new ros.geometry_msgs.PoseArray();
+
         Advertise("WaypointPub", "/hololens/navigation/waypoints", 5, out waypointPub);
         
         StartCoroutine(WaitForSpeechInit());
@@ -102,5 +108,39 @@ public class WaypointManager : RosComponent {
 
     
     void Update () {
+
+        if (TrackingManager.Instance.ContinuousTracking)
+        {
+            buffer.poses.Clear();
+        }
+
+
+        int max = (buffer.poses.Count > arrows.Count) ? buffer.poses.Count : arrows.Count;
+
+        for (int i = 1; i <= max; i++)
+        {
+            if (i > arrows.Count)
+            {
+                arrows.Add(Instantiate(DirectionArrowPrefab));
+            }
+        }
+
+
+        for (int i=0; i<max; i++)
+        {
+            GameObject arrow = arrows[i];
+            if(i < buffer.poses.Count)
+            {
+                arrow.SetActive(true);
+                arrow.transform.SetPositionAndRotation(buffer.poses[i].position.AsUnityVector, buffer.poses[i].orientation.AsUnityQuaternion);
+            }
+            else
+            {
+                arrow.SetActive(false);
+            }
+
+        }
+
+
 	}
 }
