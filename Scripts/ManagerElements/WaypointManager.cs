@@ -106,7 +106,12 @@ public class WaypointManager : ros.Singleton<WaypointManager> {
         
     }
 
-    
+    public void Stop()
+    {
+        AddingMultipleWaypoints = false;
+        buffer.poses.Clear();
+    }
+
     void Update () {
 
         if (TrackingManager.Instance.ContinuousTracking)

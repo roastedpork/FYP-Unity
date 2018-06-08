@@ -35,6 +35,11 @@ public class TrackingManager : ros.Singleton<TrackingManager> {
         });
     }
 	
+    public void Stop()
+    {
+        ContinuousTracking = false;
+    }
+
 	// Update is called once per frame
 	void Update () {
         if (ContinuousTracking && RosGazeManager.Instance.Focused)
