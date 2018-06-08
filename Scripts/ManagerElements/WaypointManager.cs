@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WaypointManager : RosComponent {
+public class WaypointManager : ros.Singleton<WaypointManager> {
 
     private RosPublisher<ros.geometry_msgs.PoseArray> waypointPub;
     private ros.geometry_msgs.PoseArray buffer;
