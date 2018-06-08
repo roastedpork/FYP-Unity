@@ -17,10 +17,12 @@ public class RearViewManager : MonoBehaviour {
         RosUserSpeechManager.Instance.AddNewPhrase("open rear view", () =>
         {
             gameObject.SetActive(true);
+            RosUserSpeechManager.Instance.StartBeep.Play();
 
             transform.position = Camera.main.transform.forward;
             transform.LookAt(Camera.main.transform);
             transform.rotation *= Quaternion.Euler(0, 180, 0);
+
 
 
         });
@@ -28,6 +30,7 @@ public class RearViewManager : MonoBehaviour {
         RosUserSpeechManager.Instance.AddNewPhrase("close rear view", () =>
         {
             gameObject.SetActive(false);
+            RosUserSpeechManager.Instance.StopBeep.Play();
         });
         gameObject.SetActive(false);
     }
