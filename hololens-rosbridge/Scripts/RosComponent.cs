@@ -68,6 +68,7 @@ public abstract class RosComponent : MonoBehaviour
             (currTimeStamp - prevTimeStamp[subscriber.name] > period[subscriber.name]))
         {
             message = subscriber.GetNewMessage();
+            prevTimeStamp[subscriber.name] = currTimeStamp;
             return true;
         }
 

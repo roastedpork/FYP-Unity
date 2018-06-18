@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
+    using System.Collections.Generic;
 using UnityEngine;
 
 public class WaypointManager : ros.Singleton<WaypointManager> {
@@ -79,7 +79,7 @@ public class WaypointManager : ros.Singleton<WaypointManager> {
                 }
                 else
                 {
-                    Quaternion camRot = Camera.main.transform.rotation * Quaternion.Euler(0, -90, 0);
+                    Quaternion camRot = Camera.main.transform.rotation;  //* Quaternion.Euler(0, -90, 0);
                     pointRot = Quaternion.Euler(0, camRot.eulerAngles.y, 0);
                 }
 

@@ -60,6 +60,12 @@ public class RosImageSubscriber : RosComponent
             String encoded = mapMsg.data;
             byte[] image = DecodeString(encoded);
 
+            if (rawImage.texture != null)
+            {
+                Texture temp = rawImage.texture;
+                rawImage.texture = null;
+                Destroy(temp);
+            }
             Texture2D tex = new Texture2D(2, 2);
             tex.LoadImage(image);
             rawImage.texture = tex;

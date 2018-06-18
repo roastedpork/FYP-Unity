@@ -47,7 +47,7 @@ public class TrackingManager : ros.Singleton<TrackingManager> {
             ros.geometry_msgs.PoseStamped msg = new ros.geometry_msgs.PoseStamped();
             msg.header.frame_id = "/Unity";
 
-            Quaternion camRot = Camera.main.transform.rotation * Quaternion.Euler(0, -90, 0);
+            Quaternion camRot = Camera.main.transform.rotation; 
             Quaternion pointRot = Quaternion.Euler(0, camRot.eulerAngles.y, 0);
             msg.pose.position = new ros.geometry_msgs.Point(RosGazeManager.Instance.position);
             msg.pose.orientation = new ros.geometry_msgs.Quaternion(pointRot);
