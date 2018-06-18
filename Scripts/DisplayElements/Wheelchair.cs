@@ -7,15 +7,13 @@ using UnityEngine;
 public class Wheelchair : ros.Singleton<Wheelchair> {
     
     private RosSubscriber<ros.geometry_msgs.Pose> sub;
-    private GameObject rosframe;
-
+    private GameObject footprint;
     public Transform RosFrame {
         get
         {
-            return rosframe.transform;
+            return transform;
         }
     }
-
 
     public GameObject FramePrefab;
 
@@ -23,7 +21,8 @@ public class Wheelchair : ros.Singleton<Wheelchair> {
 	// Use this for initialization
 	void Start () {
         Subscribe("WheelchairPoseSub", "/hololens/wheelchair_pose", 10, out sub);
-        rosframe = new GameObject();
+        footprint = transform.Find("Footprint").gameObject;
+        footprint.SetActive(false);
     }
 	
 	// Update is called once per frame
@@ -31,8 +30,9 @@ public class Wheelchair : ros.Singleton<Wheelchair> {
         ros.geometry_msgs.Pose msg;
         if (Receive(sub, out msg))
         {
-            rosframe.transform.position = msg.position.AsUnityVector;
-            rosframe.transform.rotation = msg.orientation.AsUnityQuaternion;
+            transform.position = msg.position.AsUnityVector;
+            transform.rotation = msg.orientation.AsUnityQuaternion;
+            footprint.SetActive(true);
         }
     }
 }

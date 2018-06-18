@@ -34,15 +34,13 @@ public class DrawLine : RosComponent
             for (int i=0; i<count; i++)
             {
                 Vector3 point = new Vector3((float)path.cells[i].x,
-                                            Parameters.FloorDepth,
+                                            0,
                                             (float)path.cells[i].y);
 
 
 
                 pointList.Add(point);
             }
-
-            lineRenderer.positionCount = pointList.Count;
             lineRenderer.SetPositions(pointList.ToArray());
         }
 	}

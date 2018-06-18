@@ -23,6 +23,7 @@ public class WaypointManager : ros.Singleton<WaypointManager> {
         lineRender.endWidth = 0.01f;
         lineRender.useWorldSpace = true;
         traj = new List<Vector3>();
+        lineRender.positionCount = 0;
 
         arrows = new List<GameObject>();
         buffer = new ros.geometry_msgs.PoseArray();
