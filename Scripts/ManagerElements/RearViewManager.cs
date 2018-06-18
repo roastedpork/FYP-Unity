@@ -1,12 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+
 
 public class RearViewManager : MonoBehaviour {
 
+    private RosImageSubscriber rawImage;
 
 	// Use this for initialization
 	void Start () {
+        rawImage = GetComponent<RosImageSubscriber>();
         StartCoroutine(WaitForSpeechInit());
     }
 
@@ -16,23 +20,23 @@ public class RearViewManager : MonoBehaviour {
 
         RosUserSpeechManager.Instance.AddNewPhrase("open rear view", () =>
         {
-            gameObject.SetActive(true);
+           
             RosUserSpeechManager.Instance.StartBeep.Play();
 
             transform.position = Camera.main.transform.forward;
             transform.LookAt(Camera.main.transform);
             transform.rotation *= Quaternion.Euler(0, 180, 0);
 
+            rawImage.ShowDisplay();
 
 
         });
 
         RosUserSpeechManager.Instance.AddNewPhrase("close rear view", () =>
         {
-            gameObject.SetActive(false);
+            rawImage.HideDisplay();
             RosUserSpeechManager.Instance.StopBeep.Play();
         });
-        gameObject.SetActive(false);
     }
 
     // Update is called once per frame

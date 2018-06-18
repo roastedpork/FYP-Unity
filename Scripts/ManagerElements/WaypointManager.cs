@@ -8,12 +8,22 @@ public class WaypointManager : ros.Singleton<WaypointManager> {
     private ros.geometry_msgs.PoseArray buffer;
     private bool AddingMultipleWaypoints = false;
 
+    private LineRenderer lineRender;
+    private List<Vector3> traj;
+
     public GameObject DirectionArrowPrefab;
     private List<GameObject> arrows;
 
 
 	// Use this for initialization
 	void Start () {
+
+        lineRender = GetComponent<LineRenderer>();
+        lineRender.startWidth = 0.01f;
+        lineRender.endWidth = 0.01f;
+        lineRender.useWorldSpace = true;
+        traj = new List<Vector3>();
+
         arrows = new List<GameObject>();
         buffer = new ros.geometry_msgs.PoseArray();
 
@@ -35,6 +45,7 @@ public class WaypointManager : ros.Singleton<WaypointManager> {
                 AddingMultipleWaypoints = false;
             }
 
+            traj.Clear();
             buffer = new ros.geometry_msgs.PoseArray();
             buffer.header.frame_id = "/Unity";
 
@@ -47,6 +58,15 @@ public class WaypointManager : ros.Singleton<WaypointManager> {
                 buffer.poses.Add(newPoint);
                 Publish(waypointPub, buffer);
                 RosUserSpeechManager.Instance.voicebox.StartSpeaking("Moving to new location");
+
+                traj.Add(new Vector3(Camera.main.transform.position.x,
+                             Parameters.FloorDepth,
+                             Camera.main.transform.position.z));
+                traj.Add(newPoint.position.AsUnityVector);
+                lineRender.positionCount = traj.Count;
+                lineRender.SetPositions(traj.ToArray());
+
+
 
             }
             else
@@ -79,18 +99,33 @@ public class WaypointManager : ros.Singleton<WaypointManager> {
                 }
                 else
                 {
-                    Quaternion camRot = Camera.main.transform.rotation;  //* Quaternion.Euler(0, -90, 0);
+                    Quaternion camRot = Camera.main.transform.rotation * Quaternion.Euler(0, -90, 0);
                     pointRot = Quaternion.Euler(0, camRot.eulerAngles.y, 0);
                 }
 
                 ros.geometry_msgs.Pose newPoint = new ros.geometry_msgs.Pose(RosGazeManager.Instance.position, pointRot);
                 buffer.poses.Add(newPoint);
+
+
+                traj.Clear();
+                traj.Add(new Vector3(Camera.main.transform.position.x,
+                             Parameters.FloorDepth,
+                             Camera.main.transform.position.z));
+                foreach(var p in buffer.poses)
+                {
+                    traj.Add(p.position.AsUnityVector);
+                }
+                lineRender.positionCount = traj.Count;
+                lineRender.SetPositions(traj.ToArray());
+
                 RosUserSpeechManager.Instance.voicebox.StartSpeaking("New waypoint set");
             }
              else
             {
                 RosUserSpeechManager.Instance.voicebox.StartSpeaking("Unable to set a waypoint");
             }
+
+
 
         });
 
@@ -110,6 +145,9 @@ public class WaypointManager : ros.Singleton<WaypointManager> {
     {
         AddingMultipleWaypoints = false;
         buffer.poses.Clear();
+        traj.Clear();
+        lineRender.positionCount = 0;
+        lineRender.SetPositions(traj.ToArray());
     }
 
     void Update () {
@@ -145,7 +183,6 @@ public class WaypointManager : ros.Singleton<WaypointManager> {
             }
 
         }
-
 
 	}
 }

@@ -4,25 +4,35 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class Wheelchair : RosComponent {
+public class Wheelchair : ros.Singleton<Wheelchair> {
     
-    private RosSubscriber<ros.geometry_msgs.Pose2D> sub;
-    
+    private RosSubscriber<ros.geometry_msgs.Pose> sub;
+    private GameObject rosframe;
+
+    public Transform RosFrame {
+        get
+        {
+            return rosframe.transform;
+        }
+    }
+
+
+    public GameObject FramePrefab;
+
+
 	// Use this for initialization
 	void Start () {
         Subscribe("WheelchairPoseSub", "/hololens/wheelchair_pose", 10, out sub);
+        rosframe = new GameObject();
     }
 	
 	// Update is called once per frame
 	void Update () {
-
-        while (sub.MsgReady)
+        ros.geometry_msgs.Pose msg;
+        if (Receive(sub, out msg))
         {
-            ros.geometry_msgs.Pose2D msg = sub.GetNewMessage();
-            transform.position = new Vector3((float)msg.x, 0, (float) msg.y);
-            transform.rotation = Quaternion.Euler(0, -(float) (Mathf.Rad2Deg * msg.theta), 0);
+            rosframe.transform.position = msg.position.AsUnityVector;
+            rosframe.transform.rotation = msg.orientation.AsUnityQuaternion;
         }
-
-        
     }
 }

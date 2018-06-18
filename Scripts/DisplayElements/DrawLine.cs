@@ -11,13 +11,12 @@ public class DrawLine : RosComponent
     void Start () {
 
         Subscribe("LineRenderSub", "/hololens/display/trajectory", 10, out sub);
-        
+        transform.parent = Wheelchair.Instance.RosFrame;
+
         lineRenderer = GetComponent<LineRenderer>();
         lineRenderer.startWidth = 0.01f;
         lineRenderer.endWidth = 0.01f;
         lineRenderer.useWorldSpace = false;
-        
-        
     }
     	
 	// Update is called once per frame
@@ -43,6 +42,7 @@ public class DrawLine : RosComponent
                 pointList.Add(point);
             }
 
+            lineRenderer.positionCount = pointList.Count;
             lineRenderer.SetPositions(pointList.ToArray());
         }
 	}
