@@ -25,13 +25,21 @@ public class RosImageSubscriber : RosComponent
     byte[] DecodeString(String str)
     {
         List<byte> buff = new List<byte>();
-        int pad = str.Count(c => c == '=');
-
-        String strip = str.Replace("=", "A");
-
-        for (int i = 0; i < strip.Length; i += 4)
+        int pad = 0;
+        
+        // At most 2 '=' chars are padded at the end of the encoded string
+        for (int i =0; i < 2; i++) 
         {
-            String chunk = strip.Substring(i, 4);
+            if (str[str.Count - 1 - i] == '=') 
+            {
+                str[str.Count - 1 - i] = 'A';
+                pad++;
+            }
+        }
+
+        for (int i = 0; i < str.Length; i += 4)
+        {
+            String chunk = str.Substring(i, 4);
             byte[] base64 = new byte[4];
 
             for (int j = 0; j < 4; j++)
