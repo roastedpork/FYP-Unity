@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class RearViewManager : MonoBehaviour {
 
     private RosImageSubscriber rawImage;
+    private bool active = false;
 
 	// Use this for initialization
 	void Start () {
@@ -22,10 +23,7 @@ public class RearViewManager : MonoBehaviour {
         {
            
             RosUserSpeechManager.Instance.StartBeep.Play();
-
-            transform.position = Camera.main.transform.forward;
-            transform.LookAt(Camera.main.transform);
-            transform.rotation *= Quaternion.Euler(0, 180, 0);
+            active = true;
 
             rawImage.ShowDisplay();
 
@@ -36,11 +34,18 @@ public class RearViewManager : MonoBehaviour {
         {
             rawImage.HideDisplay();
             RosUserSpeechManager.Instance.StopBeep.Play();
+            active = false;
         });
     }
 
     // Update is called once per frame
     void Update () {
-		
-	}
+        if (active)
+        {
+            transform.position = Camera.main.transform.forward;
+            transform.LookAt(Camera.main.transform);
+            transform.rotation *= Quaternion.Euler(0, 180, 0);
+        }
+        
+    }
 }
