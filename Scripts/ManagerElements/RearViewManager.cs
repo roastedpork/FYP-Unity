@@ -42,7 +42,7 @@ public class RearViewManager : MonoBehaviour {
     void Update () {
         if (active)
         {
-            transform.position = Camera.main.transform.forward;
+            transform.position = Camera.main.transform.position + Camera.main.transform.forward;
             transform.LookAt(Camera.main.transform);
             transform.rotation *= Quaternion.Euler(0, 180, 0);
         }
